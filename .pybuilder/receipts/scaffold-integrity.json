@@ -1,0 +1,7 @@
+{
+  "name": "scaffold-integrity",
+  "verdict": "pass",
+  "detail": "src/ is the only mutable tree",
+  "commit": "",
+  "data": {}
+}

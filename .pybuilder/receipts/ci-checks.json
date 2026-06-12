@@ -1,0 +1,7 @@
+{
+  "name": "ci-checks",
+  "verdict": "pass",
+  "detail": ".github/workflows mirrors local gate",
+  "commit": "",
+  "data": {}
+}
