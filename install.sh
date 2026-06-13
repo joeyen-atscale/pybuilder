@@ -34,8 +34,9 @@ if [ -z "$REPO_DIR" ] || [ ! -f "$REPO_DIR/skill/SKILL.md" ]; then
     echo "→ sparse clone into $CLONE_ROOT"
     git clone --depth 1 --filter=blob:none --sparse \
       https://github.com/j0yen/pybuilder.git "$CLONE_ROOT"
-    git -C "$CLONE_ROOT" sparse-checkout set skill src pyproject.toml README.md \
-      LICENSE-MIT LICENSE-APACHE
+    # Cone mode auto-includes all top-level files (pyproject.toml, README, licenses);
+    # list ONLY directories here — naming a file path errors in cone mode.
+    git -C "$CLONE_ROOT" sparse-checkout set skill src
   fi
   REPO_DIR="$CLONE_ROOT"
 fi
