@@ -22,7 +22,7 @@ fi
 
 # --- Mode 2: curl|bash self-clone -------------------------------------------
 if [ -z "$REPO_DIR" ] || [ ! -f "$REPO_DIR/skill/SKILL.md" ]; then
-  echo "→ no local checkout detected; self-cloning j0yen/pybuilder..."
+  echo "→ no local checkout detected; self-cloning joeyen-atscale/pybuilder..."
   command -v git >/dev/null 2>&1 || { echo "fatal: git not found" >&2; exit 1; }
   CLONE_ROOT="${PYBUILDER_CLONE_ROOT:-$HOME/.local/share/pybuilder}"
   mkdir -p "$(dirname "$CLONE_ROOT")"
@@ -33,7 +33,7 @@ if [ -z "$REPO_DIR" ] || [ ! -f "$REPO_DIR/skill/SKILL.md" ]; then
   else
     echo "→ sparse clone into $CLONE_ROOT"
     git clone --depth 1 --filter=blob:none --sparse \
-      https://github.com/j0yen/pybuilder.git "$CLONE_ROOT"
+      https://github.com/joeyen-atscale/pybuilder.git "$CLONE_ROOT"
     # Cone mode auto-includes all top-level files (pyproject.toml, README, licenses);
     # list ONLY directories here — naming a file path errors in cone mode.
     git -C "$CLONE_ROOT" sparse-checkout set skill src

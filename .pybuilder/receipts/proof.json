@@ -1,7 +1,0 @@
-{
-  "name": "proof",
-  "verdict": "pass",
-  "detail": "ruff=0 mypy=0 pytest=0",
-  "commit": "",
-  "data": {}
-}

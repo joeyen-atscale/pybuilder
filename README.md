@@ -1,7 +1,7 @@
 # pybuilder
 
 **PRD-driven, evaluation-gated Python code generation** — the Python analog of the
-Rust [`/autobuilder`](https://github.com/j0yen/autobuilder) skill, applying the four
+Rust [`/autobuilder`](https://github.com/joeyen-atscale/autobuilder-private) skill, applying the four
 pillars of *test-driven development for LLM applications* as first-class pipeline
 primitives.
 
@@ -29,9 +29,18 @@ locked-harness [`pybuilder.scaffold`](src/pybuilder/scaffold.py).
 `--target cli | lib | agent`. **`agent` is first-class** (the state-machine target is the
 reason this tool exists, not a v2 add-on).
 
+## Prerequisites
+
+- **Python 3.11+**
+- **[uv](https://docs.astral.sh/uv/)** — `curl -LsSf https://astral.sh/uv/install.sh | sh`
+- **git**
+- **Claude Code** (for the `/pybuilder` skill)
+
 ## Quickstart
 
 ```bash
+git clone https://github.com/joeyen-atscale/pybuilder.git
+cd pybuilder
 uv sync --dev
 uv run pytest -q            # the suite
 uv run pybuilder demo       # the whole pipeline on a tiny agent, no network
@@ -42,6 +51,12 @@ Install the Claude Code skill (drops `/pybuilder` into `~/.claude/skills/`):
 
 ```bash
 bash install.sh
+```
+
+Or without cloning first (curl-pipe):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/joeyen-atscale/pybuilder/main/install.sh | bash
 ```
 
 ## Layout
@@ -56,5 +71,8 @@ install.sh            curl|bash self-cloning installer
 ## Status
 
 Bootstrap v0.1. Built and self-gated by hand (chicken-and-egg: no Python builder
-existed to build the Python builder). Designed in eight PRDs under
-`~/Documents/PRDs/` (`visions/pybuilder.md`). Dual MIT/Apache-2.0.
+existed to build the Python builder). Dual MIT/Apache-2.0.
+
+**Network:** The `judge` optional dep calls Claude (`claude-sonnet-4-6` by default)
+and requires `ANTHROPIC_API_KEY` in the environment. The core pipeline (scaffold,
+audit, gate) is network-free; only the judge dimension degrades when the key is absent.

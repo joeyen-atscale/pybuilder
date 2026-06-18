@@ -7,4 +7,4 @@ __pycache__/
 .coverage
 dist/
 *.egg-info/
-.pybuilder/metrics.json
+.pybuilder/
