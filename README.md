@@ -47,7 +47,7 @@ uv run pybuilder demo       # the whole pipeline on a tiny agent, no network
 uv run pybuilder audit src  # BAD_PYTHON scan
 ```
 
-Install the Claude Code skill (drops `/pybuilder` into `~/.claude/skills/`):
+Install both skills (`/pybuilder` + `/prd-writer`) in one step:
 
 ```bash
 bash install.sh
@@ -59,13 +59,17 @@ Or without cloning first (curl-pipe):
 curl -fsSL https://raw.githubusercontent.com/joeyen-atscale/pybuilder/main/install.sh | bash
 ```
 
+**New to building software?** Start with `/prd-writer` — it helps you turn any idea into a
+clear spec before you build it. Then hand that spec to `/pybuilder`.
+
 ## Layout
 
 ```
 src/pybuilder/        the pipeline (one package; modules map 1:1 to the PRD components)
-skill/                SKILL.md + intake/judge/reviewer prompts + intent-card schema
+skill/                /pybuilder SKILL.md + intake/judge/reviewer prompts + intent-card schema
+skills/prd-writer/    /prd-writer SKILL.md — helps anyone design a personal software project
 tests/                pytest suite (log-don't-assert, stability, flowgraph, gate, audit, …)
-install.sh            curl|bash self-cloning installer
+install.sh            curl|bash installer — installs both skills + the CLI
 ```
 
 ## Status

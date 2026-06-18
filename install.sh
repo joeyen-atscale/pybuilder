@@ -13,6 +13,7 @@
 set -euo pipefail
 
 SKILL_TARGET="$HOME/.claude/skills/pybuilder"
+PRD_WRITER_TARGET="$HOME/.claude/skills/prd-writer"
 
 SCRIPT_PATH="${BASH_SOURCE[0]:-$0}"
 REPO_DIR=""
@@ -36,12 +37,12 @@ if [ -z "$REPO_DIR" ] || [ ! -f "$REPO_DIR/skill/SKILL.md" ]; then
       https://github.com/joeyen-atscale/pybuilder.git "$CLONE_ROOT"
     # Cone mode auto-includes all top-level files (pyproject.toml, README, licenses);
     # list ONLY directories here — naming a file path errors in cone mode.
-    git -C "$CLONE_ROOT" sparse-checkout set skill src
+    git -C "$CLONE_ROOT" sparse-checkout set skill skills src
   fi
   REPO_DIR="$CLONE_ROOT"
 fi
 
-# --- Mode 1: symlink the skill ----------------------------------------------
+# --- Symlink /pybuilder skill -----------------------------------------------
 mkdir -p "$(dirname "$SKILL_TARGET")"
 
 # Rescue runtime state (proposals/, datasets/) across re-installs.
@@ -67,6 +68,13 @@ if [ -n "$RESCUE" ]; then
   echo "→ rescued runtime state across re-install"
 fi
 
+# --- Symlink /prd-writer skill -----------------------------------------------
+if [ -d "$REPO_DIR/skills/prd-writer" ]; then
+  rm -rf "$PRD_WRITER_TARGET"
+  ln -s "$REPO_DIR/skills/prd-writer" "$PRD_WRITER_TARGET"
+  echo "→ skill linked: $PRD_WRITER_TARGET -> $REPO_DIR/skills/prd-writer"
+fi
+
 # --- Install the CLI ---------------------------------------------------------
 if command -v uv >/dev/null 2>&1; then
   echo "→ installing pybuilder CLI via uv tool"
@@ -77,4 +85,4 @@ else
   echo "⚠ uv not found; CLI not installed. Install uv, then: uv tool install $REPO_DIR"
 fi
 
-echo "✓ pybuilder installed. Try: pybuilder demo"
+echo "✓ installed: /pybuilder + /prd-writer. Start with: /prd-writer"
