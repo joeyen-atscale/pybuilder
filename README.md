@@ -77,6 +77,10 @@ an `ANTHROPIC_API_KEY`. Everything else (scaffold, build, test, audit) runs loca
 network required. If you don't have a key, the judge step is skipped and pybuilder will tell
 you so.
 
+**Recommended model: Claude Sonnet** (`claude-sonnet-4-6`). It's the default and the right
+choice for almost every build — fast, capable, and cost-effective. The reviewer step always
+uses Opus for an independent second opinion, but Sonnet drives the build loop itself.
+
 ## What's in the repo
 
 ```
