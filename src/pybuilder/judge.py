@@ -24,8 +24,7 @@ from dataclasses import dataclass
 from typing import Any, Protocol
 
 from .eval.dimensions import DimensionResult, Status, register
-
-OPUS_MODEL = "claude-opus-4-8"
+from .models import REVIEW_MODEL
 _FORBIDDEN_RUBRIC_TERMS = ("length", "longer", "word count", "verbose", "style")
 
 
@@ -52,7 +51,7 @@ class JudgeBackend(Protocol):
 class AnthropicJudge:
     """Opus-backed judge. Constructing it does not require the network; scoring does."""
 
-    model: str = OPUS_MODEL
+    model: str = REVIEW_MODEL
 
     def score(self, rubric: Sequence[str], artifact: str) -> float:  # pragma: no cover - network
         import anthropic  # imported lazily; optional dep

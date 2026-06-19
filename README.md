@@ -70,16 +70,30 @@ command-line tool.
 
 That's it. No Docker, no cloud accounts, no infrastructure to set up.
 
-## A note on Claude
+## Models
 
-The judge step — where pybuilder does an independent quality review — calls Claude and requires
-an `ANTHROPIC_API_KEY`. Everything else (scaffold, build, test, audit) runs locally with no
-network required. If you don't have a key, the judge step is skipped and pybuilder will tell
-you so.
+pybuilder uses different Claude models for different stages — so it's efficient for people
+with lower API rate limits while still using the strongest model where it matters.
 
-**Recommended model: Claude Sonnet** (`claude-sonnet-4-6`). It's the default and the right
-choice for almost every build — fast, capable, and cost-effective. The reviewer step always
-uses Opus for an independent second opinion, but Sonnet drives the build loop itself.
+| Stage | Model |
+|---|---|
+| Reading and understanding the PRD | Sonnet |
+| Generating project structure (scaffold) | Haiku |
+| Writing code, evaluating quality | Sonnet |
+| Checking receipts and gate results | Haiku |
+| Independent reviewer (final approval) | Opus |
+| Postmortem summary | Haiku |
+
+**The reviewer always uses Opus.** That's the independent second opinion that ensures
+pybuilder can't approve its own work. Everything else defaults to Sonnet for the reasoning
+steps and Haiku for the mechanical ones.
+
+These defaults are set in `src/pybuilder/models.py` and can be overridden with environment
+variables (`PYBUILDER_BUILD_MODEL`, `PYBUILDER_REVIEW_MODEL`, `PYBUILDER_FAST_MODEL`) if
+you need to.
+
+An `ANTHROPIC_API_KEY` is required for the reviewer and judge steps. Everything else
+(scaffold, audit, gate receipt checks) runs locally with no network call.
 
 ## What's in the repo
 
