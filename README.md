@@ -1,82 +1,92 @@
 # pybuilder
 
-**PRD-driven, evaluation-gated Python code generation** — the Python analog of the
-Rust [`/autobuilder`](https://github.com/joeyen-atscale/autobuilder-private) skill, applying the four
-pillars of *test-driven development for LLM applications* as first-class pipeline
-primitives.
+**Turn an idea into working, tested Python software** — using Claude Code as your build partner.
 
-Where autobuilder advances a Rust build on a single deterministic pass/fail signal,
-pybuilder advances LLM-bearing Python on a **quality vector** and refuses to ship on
-vibes. The thing that grades the AtScale semantic-layer thesis (text-to-SQL graders,
-MCP trajectory audits) should itself be proven — that is what this builds.
+You describe what you want to build. pybuilder scaffolds the project, writes the code, tests it,
+and won't declare it done until it actually works. Not "it compiled" works — *"it does what you
+asked for"* works.
 
-## The four pillars (and where they live)
+It's designed for people who have a clear idea of what they want, but don't want to spend their
+time wiring up boilerplate, writing test harnesses, or second-guessing whether the code is any
+good. pybuilder handles all of that.
 
-| Pillar (from the TDD-of-LLM article) | Module |
-|---|---|
-| **State-machine modeling** — the flowchart *is* the code; traces become tests | [`pybuilder.flowgraph`](src/pybuilder/flowgraph.py) |
-| **Multi-dimensional eval** — a vector (exact/fuzzy/static/human/judge), not a boolean | [`pybuilder.eval`](src/pybuilder/eval/) |
-| **Log-don't-assert** — record every dimension per run, aggregate to CSV/DataFrame | [`pybuilder.eval.results_bag`](src/pybuilder/eval/results_bag.py) |
-| **Stability + provenance** — N-run variance → spec signal; every row git-commit-pinned | [`pybuilder.stability`](src/pybuilder/stability.py), [`pybuilder.dataset`](src/pybuilder/dataset.py) |
+## What it builds
 
-Plus the receipt-based [`pybuilder.gate`](src/pybuilder/gate.py) (ready/blocked, no
-self-approval), the AST-based [`pybuilder.bad_python`](src/pybuilder/bad_python.py) audit,
-the always-Opus calibrated [`pybuilder.judge`](src/pybuilder/judge.py), and the
-locked-harness [`pybuilder.scaffold`](src/pybuilder/scaffold.py).
+Three kinds of Python projects:
 
-## Targets
+- **CLI tool** — a command you run in the terminal. Good for automation, file processing,
+  data wrangling, scheduled tasks. The fastest thing to build and the best starting point
+  if you're not sure which type you need.
 
-`--target cli | lib | agent`. **`agent` is first-class** (the state-machine target is the
-reason this tool exists, not a v2 add-on).
+- **Library** — reusable code another project imports. Good for shared logic, data models,
+  API wrappers.
+
+- **Agent** — a program that reasons and makes decisions, not just executes steps.
+  Good for anything that involves language models, multi-step workflows, or adaptive behavior.
+  This is pybuilder's specialty.
+
+## How it works
+
+You start with a PRD — a short document describing what you want. If you don't have one yet,
+use `/prd-writer` first (it's included). Then you invoke `/pybuilder` in Claude Code.
+
+Behind the scenes, pybuilder runs a loop:
+
+1. **Understand** — extracts your requirements and acceptance criteria from the PRD
+2. **Scaffold** — creates the project structure and a locked test harness you can't accidentally break
+3. **Build** — writes code in `src/` only, then runs the full quality check
+4. **Evaluate** — measures the result across multiple dimensions (not just "did it crash?")
+5. **Gate** — an independent review that must pass before anything is declared ready
+
+It won't ship on a green test suite alone. LLM-bearing code behaves differently across runs, so
+pybuilder runs the same inputs multiple times and checks for consistency. A flaky result is a
+signal that the spec needs sharpening, not that you should ignore it.
+
+## Getting started
+
+**First time?** Start with `/prd-writer`. It helps you turn any idea into the kind of clear
+description pybuilder can act on. Takes about ten minutes.
+
+**Have a PRD?** Install everything in one step:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/joeyen-atscale/pybuilder/main/install.sh | bash
+```
+
+This installs two Claude Code skills (`/prd-writer` and `/pybuilder`) and the `pybuilder`
+command-line tool.
+
+**Then in Claude Code:**
+```
+/pybuilder path/to/your-prd.md
+```
 
 ## Prerequisites
 
 - **Python 3.11+**
 - **[uv](https://docs.astral.sh/uv/)** — `curl -LsSf https://astral.sh/uv/install.sh | sh`
 - **git**
-- **Claude Code** (for the `/pybuilder` skill)
+- **[Claude Code](https://claude.ai/code)**
 
-## Quickstart
+That's it. No Docker, no cloud accounts, no infrastructure to set up.
 
-```bash
-git clone https://github.com/joeyen-atscale/pybuilder.git
-cd pybuilder
-uv sync --dev
-uv run pytest -q            # the suite
-uv run pybuilder demo       # the whole pipeline on a tiny agent, no network
-uv run pybuilder audit src  # BAD_PYTHON scan
-```
+## A note on Claude
 
-Install both skills (`/pybuilder` + `/prd-writer`) in one step:
+The judge step — where pybuilder does an independent quality review — calls Claude and requires
+an `ANTHROPIC_API_KEY`. Everything else (scaffold, build, test, audit) runs locally with no
+network required. If you don't have a key, the judge step is skipped and pybuilder will tell
+you so.
 
-```bash
-bash install.sh
-```
-
-Or without cloning first (curl-pipe):
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/joeyen-atscale/pybuilder/main/install.sh | bash
-```
-
-**New to building software?** Start with `/prd-writer` — it helps you turn any idea into a
-clear spec before you build it. Then hand that spec to `/pybuilder`.
-
-## Layout
+## What's in the repo
 
 ```
-src/pybuilder/        the pipeline (one package; modules map 1:1 to the PRD components)
-skill/                /pybuilder SKILL.md + intake/judge/reviewer prompts + intent-card schema
-skills/prd-writer/    /prd-writer SKILL.md — helps anyone design a personal software project
-tests/                pytest suite (log-don't-assert, stability, flowgraph, gate, audit, …)
-install.sh            curl|bash installer — installs both skills + the CLI
+src/pybuilder/        the build pipeline
+skill/                the /pybuilder Claude Code skill
+skills/prd-writer/    the /prd-writer Claude Code skill
+tests/                the test suite
+install.sh            installs both skills and the CLI
 ```
 
-## Status
+## License
 
-Bootstrap v0.1. Built and self-gated by hand (chicken-and-egg: no Python builder
-existed to build the Python builder). Dual MIT/Apache-2.0.
-
-**Network:** The `judge` optional dep calls Claude (`claude-sonnet-4-6` by default)
-and requires `ANTHROPIC_API_KEY` in the environment. The core pipeline (scaffold,
-audit, gate) is network-free; only the judge dimension degrades when the key is absent.
+MIT OR Apache-2.0.
